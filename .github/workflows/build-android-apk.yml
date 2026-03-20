@@ -1,0 +1,41 @@
+name: Expo Local Android APK Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Build APK locally
+        run: |
+          mkdir -p dist
+          expo build:android -t apk --non-interactive
+          cp $(find . -name "*.apk" | head -n 1) dist/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: dist/*.apk
