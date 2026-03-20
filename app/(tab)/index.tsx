@@ -1,5 +1,8 @@
-import { Camera, MapView, ShapeSource, SymbolLayer } from '@rnmapbox/maps';
-import { Dimensions, View } from "react-native";
+import { Camera, Images, MapView, setAccessToken, ShapeSource, SymbolLayer } from '@rnmapbox/maps';
+import { useRouter } from 'expo-router';
+import { View } from "react-native";
+
+setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_KEY!)
 
 const geojson: GeoJSON.GeoJSON = {
   type: "FeatureCollection",
@@ -38,33 +41,45 @@ const geojson: GeoJSON.GeoJSON = {
 };
 
 export default function Index() {
+  const { push } = useRouter()
+
   return (
-    <View style={{ flex: 1, height: Dimensions.get("screen").height }}>
+    <View style={{ flex: 1 }}>
       <MapView
-        style={{ flex: 1, height: Dimensions.get("screen").height }}
+        style={{ flex: 1 }}
         compassEnabled={false}
         scaleBarEnabled={false}
         attributionEnabled={false}
         logoEnabled={false}
+        styleURL={process.env.EXPO_PUBLIC_MAPBOX_MAPBOX_STYLE_URL}
       >
         <Camera
           zoomLevel={12}
           centerCoordinate={[96.1735, 16.8409]}
         />
 
-        <ShapeSource id="markets" shape={geojson} onPress={console.log}>
+        <Images
+          images={{
+            pin: require('../../assets/images/pin.png')
+          }}
+        />
+
+        <ShapeSource id="markets" shape={geojson} onPress={() => push("/place-detail-modal")}>
           <SymbolLayer
             id="marketSymbols"
             style={{
-              iconImage: require('../assets/images/pin.png'),
+              iconImage: 'pin',
               iconAllowOverlap: true,
-              iconSize: 0.3,
+              iconSize: 0.35,
               textField: ['get', 'name'],
               textOffset: [1.2, 0],
               textAnchor: 'left',
               textAllowOverlap: false,
               textSize: 14,
-              textColor: '#000'
+              textColor: '#2C8251',
+              textHaloColor: '#FFFFFF',
+              textHaloWidth: 2,
+              textFont: ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
             }}
           />
         </ShapeSource>
